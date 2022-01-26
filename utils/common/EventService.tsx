@@ -1,36 +1,41 @@
+import { bindClassMethods } from '.';
 
-type EventCallback<EventMessageType>= {
-    eventType: EventMessageType,
-    callback: Function
-}
+type EventCallback<EventMessageType> = {
+  eventType: EventMessageType;
+  callback: Function;
+};
 
-class EventListener<EventMessageType>{
-    callbacks: EventCallback<EventMessageType>[]
-    constructor(){
-        this.callbacks = []
-    }
+class EventListener<EventMessageType> {
+  callbacks: EventCallback<EventMessageType>[];
+  constructor() {
+    this.callbacks = [];
+    bindClassMethods(this, [
+      'addEventListener',
+      'removeEventListener',
+      'emitEvent',
+    ]);
+  }
 
-    addEventListener(eventType: EventMessageType, callback: Function){
-        this.callbacks.push({
-            eventType,
-            callback
-        })
-    }
+  addEventListener(eventType: EventMessageType, callback: Function) {
+    this.callbacks.push({
+      eventType,
+      callback,
+    });
+  }
 
-    removeEventListener(callback: Function){
-        this.callbacks = this.callbacks.filter(listenerObj => {
-           return listenerObj.callback !== callback
-        })
-    }
+  removeEventListener(callback: Function) {
+    this.callbacks = this.callbacks.filter((listenerObj) => {
+      return listenerObj.callback !== callback;
+    });
+  }
 
-    emitEvent(eventType: EventMessageType, ...eventArgs: any[]){
-        this.callbacks.forEach(listenerObj => {
-            if(listenerObj.eventType === eventType){
-                listenerObj.callback(...eventArgs);
-            }
-        })
-    }
-
+  emitEvent(eventType: EventMessageType, ...eventArgs: any[]) {
+    this.callbacks.forEach((listenerObj) => {
+      if (listenerObj.eventType === eventType) {
+        listenerObj.callback(...eventArgs);
+      }
+    });
+  }
 }
 
 export default EventListener;
