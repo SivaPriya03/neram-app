@@ -1,6 +1,14 @@
 import styles from '../../styles/Home.module.css';
 import taskDB from '../../utils/database/services/TaskService';
-import { Button, HStack } from '@chakra-ui/react';
+import {
+  Button,
+  HStack,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from '@chakra-ui/react';
 import { useCallback, useEffect, useState } from 'react';
 import { Task } from '../../schema/Task';
 import { db } from '../../utils/database';
@@ -42,7 +50,10 @@ function getTaskTitle(length: number = 10): string {
 
 const App = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [notificationInterval, setNotificationInterval] =
+    useState<string>('5000');
   const [isLoading, setIsLoading] = useState(true);
+  const interval = parseInt(notificationInterval);
   const addTask = async () => {
     const title: string = getTaskTitle(10);
     const notes: string = 'Bye';
@@ -67,10 +78,11 @@ const App = () => {
   }, []);
 
   const triggerSampleNotification = () => {
+    count = 0;
     if (window.Notification) {
       Notification.requestPermission().then((result) => {
         if (result === 'granted') {
-          setTimeout(randomNotification, 5000);
+          setTimeout(randomNotification, interval);
         }
       });
     }
@@ -86,8 +98,12 @@ const App = () => {
     if (count > 2) {
     } else {
       count++;
-      setTimeout(randomNotification, 5000);
+      setTimeout(randomNotification, interval);
     }
+  }
+
+  function onChange(value: any): void {
+    setNotificationInterval(value);
   }
 
   useEffect(() => {
@@ -107,8 +123,23 @@ const App = () => {
         <Button colorScheme="blue" onClick={addTask}>
           Add Task
         </Button>
+
+        <NumberInput
+          value={interval}
+          min={1000}
+          max={30000}
+          step={500}
+          onChange={onChange}
+        >
+          <NumberInputField />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
+
         <Button colorScheme="red" onClick={triggerSampleNotification}>
-          Enable Notification
+          Trigger Notification
         </Button>
       </HStack>
       <Tasks tasks={tasks} />
